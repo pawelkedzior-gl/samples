@@ -36,8 +36,12 @@ from ucp_sdk.models.schemas.shopping.fulfillment import (
 from ucp_sdk.models.schemas.shopping.order import Order
 from ucp_sdk.models.schemas.shopping.order import PlatformSchema
 
-from ucp_sdk.models.schemas.shopping.checkout_create_request import CheckoutCreateRequest
-from ucp_sdk.models.schemas.shopping.checkout_update_request import CheckoutUpdateRequest
+from ucp_sdk.models.schemas.shopping.checkout_create_request import (
+  CheckoutCreateRequest,
+)
+from ucp_sdk.models.schemas.shopping.checkout_update_request import (
+  CheckoutUpdateRequest,
+)
 
 
 class UnifiedOrder(Order):
@@ -57,7 +61,7 @@ class UnifiedCheckout(
 
 class UnifiedCheckoutCreateRequest(CheckoutCreateRequest):
   """Create request model combining base fields and extensions."""
-  
+
   fulfillment: Fulfillment | None = None
   discounts: DiscountsObject | None = None
   buyer_consent: Any | None = None
@@ -65,7 +69,7 @@ class UnifiedCheckoutCreateRequest(CheckoutCreateRequest):
 
 class UnifiedCheckoutUpdateRequest(CheckoutUpdateRequest):
   """Update request model combining base fields and extensions."""
-  
+
   fulfillment: Fulfillment | None = None
   discounts: DiscountsObject | None = None
   buyer_consent: Any | None = None

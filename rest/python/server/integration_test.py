@@ -31,8 +31,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import delete
-from ucp_sdk.models.schemas.shopping import checkout_create_request as checkout_create_req
-from ucp_sdk.models.schemas.shopping import payment_create_request as payment_create_req
+from ucp_sdk.models.schemas.shopping import (
+  checkout_create_request as checkout_create_req,
+)
+from ucp_sdk.models.schemas.shopping import (
+  payment_create_request as payment_create_req,
+)
 from ucp_sdk.models.schemas.shopping.ap2_mandate import Checkout as Ap2Checkout
 from ucp_sdk.models.schemas.shopping.buyer_consent import (
   Checkout as BuyerConsentCheckoutResp,
@@ -47,17 +51,27 @@ from ucp_sdk.models.schemas.shopping.fulfillment import (
   Checkout as FulfillmentCheckout,
 )
 from ucp_sdk.models.schemas.shopping.order import PlatformSchema
-from ucp_sdk.models.schemas.shopping.payment import Payment as PaymentData
 from ucp_sdk.models.schemas.shopping.types import card_payment_instrument
-from ucp_sdk.models.schemas.shopping.types import fulfillment_destination as fulfillment_destination_req
-from ucp_sdk.models.schemas.shopping.types import fulfillment_group_create_request as fulfillment_group_create_req
-from ucp_sdk.models.schemas.shopping.types import fulfillment_method_create_request as fulfillment_method_create_req
+from ucp_sdk.models.schemas.shopping.types import (
+  fulfillment_group_create_request as fulfillment_group_create_req,
+)
+from ucp_sdk.models.schemas.shopping.types import (
+  fulfillment_method_create_request as fulfillment_method_create_req,
+)
 from ucp_sdk.models.schemas.shopping.types import fulfillment as fulfillment_req
-from ucp_sdk.models.schemas.shopping.types import item_create_request as item_create_req
-from ucp_sdk.models.schemas.shopping.types import line_item_create_request as line_item_create_req
+from ucp_sdk.models.schemas.shopping.types import (
+  item_create_request as item_create_req,
+)
+from ucp_sdk.models.schemas.shopping.types import (
+  line_item_create_request as line_item_create_req,
+)
 from ucp_sdk.models.schemas.shopping.types import payment_instrument
-from ucp_sdk.models.schemas.shopping.types import shipping_destination as shipping_destination_req
-from ucp_sdk.models.schemas.shopping.types import token_credential as token_credential_resp
+from ucp_sdk.models.schemas.shopping.types import (
+  shipping_destination as shipping_destination_req,
+)
+from ucp_sdk.models.schemas.shopping.types import (
+  token_credential as token_credential_resp,
+)
 
 FLAGS = flags.FLAGS
 
@@ -265,10 +279,10 @@ class IntegrationTest(absltest.TestCase):
       credential=credential,
     )
     return {
-      "payment_data": payment_instrument.PaymentInstrument(root=instrument).model_dump(
-          mode="json", exclude_none=True
-      ),
-      "risk_signals": {}
+      "payment_data": payment_instrument.PaymentInstrument(
+        root=instrument
+      ).model_dump(mode="json", exclude_none=True),
+      "risk_signals": {},
     }
 
   def test_single_item_checkout(self) -> None:

@@ -54,17 +54,20 @@ from pydantic import AnyUrl
 from pydantic import BaseModel
 from services.fulfillment_service import FulfillmentService
 from sqlalchemy.ext.asyncio import AsyncSession
-from ucp_sdk.models.schemas.ucp import ResponseCheckoutSchema as ResponseCheckout
+from ucp_sdk.models.schemas.ucp import (
+  ResponseCheckoutSchema as ResponseCheckout,
+)
 from ucp_sdk.models.schemas.ucp import ResponseOrderSchema as ResponseOrder
 from ucp_sdk.models.schemas.ucp import UcpMetadata
 from ucp_sdk.models.schemas.ucp import Version
 from ucp_sdk.models.schemas.capability import ResponseSchema as Response
-from ucp_sdk.models.schemas.shopping.ap2_mandate import Checkout as Ap2CompleteRequest
+from ucp_sdk.models.schemas.shopping.ap2_mandate import (
+  Checkout as Ap2CompleteRequest,
+)
 from ucp_sdk.models.schemas.shopping.discount import Allocation
 from ucp_sdk.models.schemas.shopping.discount import AppliedDiscount
 from ucp_sdk.models.schemas.shopping.discount import DiscountsObject
 from ucp_sdk.models.schemas.shopping.fulfillment import (
-  Checkout as FulfillmentResp,
   Fulfillment as FulfillmentWrapper,
 )
 from ucp_sdk.models.schemas.shopping.order import (
@@ -78,7 +81,6 @@ from ucp_sdk.models.schemas.shopping.payment_create_request import (
 from ucp_sdk.models.schemas.shopping.payment import Payment as PaymentResponse
 from ucp_sdk.models.schemas.shopping.types import order_line_item
 from ucp_sdk.models.schemas.shopping.types import total as total_resp
-from ucp_sdk.models.schemas.shopping.types.card_credential import CardCredential
 from ucp_sdk.models.schemas.shopping.types.expectation import Expectation
 from ucp_sdk.models.schemas.shopping.types.expectation import (
   LineItem as ExpectationLineItem,
@@ -106,9 +108,6 @@ from ucp_sdk.models.schemas.shopping.types.order_line_item import OrderLineItem
 from ucp_sdk.models.schemas.shopping.types.postal_address import PostalAddress
 from ucp_sdk.models.schemas.shopping.types.shipping_destination import (
   ShippingDestination as ShippingDestinationResponse,
-)
-from ucp_sdk.models.schemas.shopping.types.token_credential import (
-  TokenCredential as TokenCredentialResponse,
 )
 from ucp_sdk.models.schemas.shopping.types.total import (
   Total as TotalResponse,
@@ -323,8 +322,12 @@ class CheckoutService:
       totals=[],
       links=[],
       payment=PaymentResponse(
-        instruments=checkout_req.payment.instruments if checkout_req.payment else None,
-      ) if checkout_req.payment else None,
+        instruments=checkout_req.payment.instruments
+        if checkout_req.payment
+        else None,
+      )
+      if checkout_req.payment
+      else None,
       platform=platform_config,
       fulfillment=fulfillment_resp,
       **checkout_data,
@@ -706,7 +709,9 @@ class CheckoutService:
           if method.selected_destination_id and method.destinations:
             for dest in method.destinations:
               dest_root = getattr(dest, "root", dest)
-              if getattr(dest_root, "id", None) == method.selected_destination_id:
+              if (
+                getattr(dest_root, "id", None) == method.selected_destination_id
+              ):
                 selected_dest = PostalAddress(
                   street_address=getattr(dest_root, "street_address", None),
                   address_locality=getattr(dest_root, "address_locality", None),
@@ -721,7 +726,11 @@ class CheckoutService:
               if getattr(group, "selected_option_id", None):
                 options = getattr(group, "options", [])
                 selected_opt = next(
-                  (o for o in (options or []) if o.id == group.selected_option_id),
+                  (
+                    o
+                    for o in (options or [])
+                    if o.id == group.selected_option_id
+                  ),
                   None,
                 )
                 expectation_id = f"exp_{uuid.uuid4()}"
@@ -732,7 +741,8 @@ class CheckoutService:
                     exp_line_items.append(
                       ExpectationLineItem(id=li.id, quantity=li.quantity)
                     )
-                # Fallback to all line items if none match (e.g. tests using item_123)
+                # Fallback to all line items if none match
+                # (e.g. tests using item_123)
                 if not exp_line_items:
                   for li in checkout.line_items:
                     exp_line_items.append(
@@ -745,7 +755,9 @@ class CheckoutService:
                     line_items=exp_line_items,
                     method_type=method.type,
                     destination=selected_dest,
-                    description=getattr(selected_opt, "title", "Standard Shipping"),
+                    description=getattr(
+                      selected_opt, "title", "Standard Shipping"
+                    ),
                   )
                 )
 
@@ -768,19 +780,23 @@ class CheckoutService:
       order = Order(
         ucp=UcpMetadata(
           root=ResponseOrder(
-            version=getattr(checkout.ucp.root, "version", Version("2026-01-23")),
+            version=getattr(
+              checkout.ucp.root, "version", Version("2026-01-23")
+            ),
             capabilities={
-              getattr(k, "root", k): v for k, v in checkout.ucp.root.capabilities.items()
-            } if hasattr(checkout.ucp.root, "capabilities") and checkout.ucp.root.capabilities else {},
+              getattr(k, "root", k): v
+              for k, v in checkout.ucp.root.capabilities.items()
+            }
+            if hasattr(checkout.ucp.root, "capabilities")
+            and checkout.ucp.root.capabilities
+            else {},
           )
         ),
         id=checkout.order.id,
         checkout_id=checkout.id,
         permalink_url=checkout.order.permalink_url,
         line_items=order_line_items,
-        totals=[
-          total_resp.Total(**t.model_dump()) for t in checkout.totals
-        ],
+        totals=[total_resp.Total(**t.model_dump()) for t in checkout.totals],
         fulfillment=OrderFulfillment(expectations=expectations, events=[]),
       )
 
@@ -1172,13 +1188,14 @@ class CheckoutService:
     if not instruments:
       raise InvalidRequestError("Missing payment instruments")
 
-    # In 01-23 SDK, selected_instrument_id is removed. We process the first provided instrument.
+    # In 01-23 SDK, selected_instrument_id is removed.
+    # We process the first provided instrument.
     selected_instrument = instruments[0]
 
     handler_id = getattr(selected_instrument, "handler_id", None)
     if not handler_id:
       raise InvalidRequestError("Missing handler_id in instrument")
-      
+
     credential = getattr(selected_instrument, "credential", None)
     if not credential:
       raise InvalidRequestError("Missing credentials in instrument")

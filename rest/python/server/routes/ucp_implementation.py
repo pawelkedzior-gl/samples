@@ -33,14 +33,13 @@ from models import UnifiedCheckoutCreateRequest
 from pydantic import BaseModel
 from pydantic import HttpUrl
 from services.checkout_service import CheckoutService
-from ucp_sdk.models.schemas.shopping.ap2_mandate import Checkout as Ap2CompleteRequest
+from ucp_sdk.models.schemas.shopping.ap2_mandate import (
+  Checkout as Ap2CompleteRequest,
+)
 from ucp_sdk.models.schemas.shopping.order import Order
 from ucp_sdk.models.schemas.shopping.order import PlatformSchema
 from ucp_sdk.models.schemas.shopping.payment_create_request import (
   PaymentCreateRequest,
-)
-from ucp_sdk.models.schemas.shopping.types.payment_instrument import (
-  PaymentInstrument,
 )
 
 logger = logging.getLogger(__name__)
@@ -101,7 +100,9 @@ async def extract_webhook_url(ucp_agent: str) -> str | None:
       if "ucp" in profile_dict:
         capabilities = profile_dict["ucp"].get("capabilities", {})
         if isinstance(capabilities, dict):
-          cap_list = [c_obj for c_list in capabilities.values() for c_obj in c_list]
+          cap_list = [
+            c_obj for c_list in capabilities.values() for c_obj in c_list
+          ]
         elif isinstance(capabilities, list):
           cap_list = capabilities
         else:
@@ -111,10 +112,15 @@ async def extract_webhook_url(ucp_agent: str) -> str | None:
           if isinstance(cap, dict):
             config = cap.get("config", {})
             if isinstance(config, dict) and config.get("webhook_url"):
-                return str(config["webhook_url"])
+              return str(config["webhook_url"])
           else:
-            if hasattr(cap, "config") and cap.config and hasattr(cap.config, "webhook_url") and cap.config.webhook_url:
-                return str(cap.config.webhook_url)
+            if (
+              hasattr(cap, "config")
+              and cap.config
+              and hasattr(cap.config, "webhook_url")
+              and cap.config.webhook_url
+            ):
+              return str(cap.config.webhook_url)
 
       logger.warning("No webhook_url found in profile from %s", profile_uri)
   except httpx.RequestError as e:

@@ -19,7 +19,6 @@ import pathlib
 import uuid
 from fastapi import APIRouter
 from fastapi import Request
-from ucp_sdk.models.schemas.ucp import BusinessSchema
 
 router = APIRouter()
 
