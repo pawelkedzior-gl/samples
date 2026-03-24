@@ -64,6 +64,7 @@ from ucp_sdk.models.schemas.shopping.discount import AppliedDiscount
 from ucp_sdk.models.schemas.shopping.discount import DiscountsObject
 from ucp_sdk.models.schemas.shopping.fulfillment import (
   Checkout as FulfillmentResp,
+  Fulfillment as FulfillmentWrapper,
 )
 from ucp_sdk.models.schemas.shopping.order import (
   Fulfillment as OrderFulfillment,
@@ -297,7 +298,7 @@ class CheckoutService:
             )
           )
 
-      fulfillment_resp = FulfillmentResp(
+      fulfillment_resp = FulfillmentWrapper(
         root=FulfillmentResponseClass(methods=resp_methods)
       )
 
@@ -310,6 +311,7 @@ class CheckoutService:
             version=Version(config.get_server_version()),
           )
         ],
+        payment_handlers=[],
       ),
       id=checkout_id,
       status=CheckoutStatus.IN_PROGRESS,
@@ -571,14 +573,14 @@ class CheckoutService:
           )
           resp_methods.append(method_resp)
 
-      existing.fulfillment = FulfillmentResp(
+      existing.fulfillment = FulfillmentWrapper(
         root=FulfillmentResponseClass(
           methods=resp_methods,
         )
       )
 
-    if checkout_req.discounts:
-      existing.discounts = checkout_req.discounts
+    if getattr(checkout_req, "discount", None):
+      existing.discount = checkout_req.discount
 
     if platform_config:
       existing.platform = platform_config
@@ -998,14 +1000,14 @@ class CheckoutService:
 
       base_amount = product.price * line.quantity
       line.totals = [
-        Total(type="subtotal", amount=base_amount),
-        Total(type="total", amount=base_amount),
+        TotalResponse(type="subtotal", amount=base_amount),
+        TotalResponse(type="total", amount=base_amount),
       ]
       grand_total += base_amount
 
     checkout.totals = []
     # Always include subtotal for clarity when other costs might be added
-    checkout.totals.append(Total(type="subtotal", amount=grand_total))
+    checkout.totals.append(TotalResponse(type="subtotal", amount=grand_total))
 
     # Fulfillment Logic
     if checkout.fulfillment and checkout.fulfillment.root.methods:
@@ -1112,7 +1114,7 @@ class CheckoutService:
                 )
                 grand_total += opt_total
                 checkout.totals.append(
-                  Total(type="fulfillment", amount=opt_total)
+                  TotalResponse(type="fulfillment", amount=opt_total)
                 )
 
     # Discount Logic
@@ -1155,10 +1157,10 @@ class CheckoutService:
               )
             )
             checkout.totals.append(
-              Total(type="discount", amount=discount_amount)
+              TotalResponse(type="discount", amount=discount_amount)
             )
 
-    checkout.totals.append(Total(type="total", amount=grand_total))
+    checkout.totals.append(TotalResponse(type="total", amount=grand_total))
 
   async def _process_payment(self, payment: PaymentCreateRequest) -> None:
     """Validate and process payment instruments."""

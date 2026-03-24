@@ -45,4 +45,11 @@ async def get_merchant_profile(request: Request):
     "{{ENDPOINT}}", str(request.base_url).rstrip("/")
   ).replace("{{SHOP_ID}}", SHOP_ID)
 
-  return BusinessSchema(**json.loads(profile_json))
+  profile_data = json.loads(profile_json)
+  if "ucp" in profile_data:
+    profile_data = profile_data["ucp"]
+
+  if "payment_handlers" not in profile_data:
+    profile_data["payment_handlers"] = []
+
+  return BusinessSchema(**profile_data)
