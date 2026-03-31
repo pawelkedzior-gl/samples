@@ -1,0 +1,5 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/cloud-cdn-krk/pk-ucp-sample-server', '-f', 'samples/rest/python/server/Dockerfile', '.']
+images:
+- 'gcr.io/cloud-cdn-krk/pk-ucp-sample-server'
