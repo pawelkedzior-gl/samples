@@ -93,6 +93,8 @@ class IntegrationTest(absltest.TestCase):
   def setUp(self) -> None:
     """Set up the test environment, including temporary DBs and dependencies."""
     super().setUp()
+    if not FLAGS.is_parsed():
+      FLAGS(argv=[""])
     # Create a temporary directory for test databases
     self.test_dir = Path(tempfile.mkdtemp())
     self.products_db = self.test_dir / "test_products.db"

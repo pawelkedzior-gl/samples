@@ -52,7 +52,7 @@ from models import UnifiedCheckoutCreateRequest
 from models import UnifiedCheckoutUpdateRequest
 from pydantic import AnyUrl
 from pydantic import BaseModel
-from services.fulfillment_service import FulfillmentService
+from ucp_example_services.fulfillment_service import FulfillmentService
 from sqlalchemy.ext.asyncio import AsyncSession
 from ucp_sdk.models.schemas.ucp import (
   ResponseCheckoutSchema as ResponseCheckout,

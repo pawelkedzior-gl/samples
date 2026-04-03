@@ -32,7 +32,7 @@ import models
 from models import UnifiedCheckoutCreateRequest
 from pydantic import BaseModel
 from pydantic import HttpUrl
-from services.checkout_service import CheckoutService
+from ucp_example_services.checkout_service import CheckoutService
 from ucp_sdk.models.schemas.shopping.ap2_mandate import (
   Checkout as Ap2CompleteRequest,
 )

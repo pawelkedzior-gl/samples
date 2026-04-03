@@ -22,7 +22,7 @@ from fastapi import Body
 from fastapi import Depends
 from fastapi import Path
 from models import UnifiedOrder
-from services.checkout_service import CheckoutService
+from ucp_example_services.checkout_service import CheckoutService
 
 router = APIRouter()
 

@@ -33,8 +33,9 @@ from fastapi import Header
 from fastapi import HTTPException
 from fastapi import Request
 from pydantic import BaseModel
-from services.checkout_service import CheckoutService
-from services.fulfillment_service import FulfillmentService
+from ucp_example_services.checkout_service import CheckoutService as DefaultCheckoutService
+from woo_commerce.checkout_service import CheckoutService as WooCheckoutService
+from ucp_example_services.fulfillment_service import FulfillmentService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -165,11 +166,20 @@ def get_checkout_service(
   ],
   products_session: Annotated[AsyncSession, Depends(get_products_db)],
   transactions_session: Annotated[AsyncSession, Depends(get_transactions_db)],
-) -> CheckoutService:
+) -> DefaultCheckoutService | WooCheckoutService:
   """Dependency provider for CheckoutService."""
-  return CheckoutService(
-    fulfillment_service,
-    products_session,
-    transactions_session,
-    str(request.base_url),
-  )
+  if config.FLAGS.woo_commerce:
+    return WooCheckoutService(
+      fulfillment_service,
+      products_session,
+      transactions_session,
+      str(request.base_url),
+      woo_commerce_address=config.FLAGS.woo_commerce,
+    )
+  else:
+    return DefaultCheckoutService(
+      fulfillment_service,
+      products_session,
+      transactions_session,
+      str(request.base_url),
+    )

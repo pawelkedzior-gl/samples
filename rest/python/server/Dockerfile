@@ -32,4 +32,6 @@ RUN mkdir -p /app/data && \
 CMD python3 server.py \
     --products_db_path=/app/data/products.db \
     --transactions_db_path=/app/data/transactions.db \
-    --port=$PORT
+    --port=$PORT \
+    --woo_commerce=http://34.118.53.208:8080
+

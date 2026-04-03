@@ -53,6 +53,7 @@ try:
     "Secret key for simulation endpoints",
   )
   flags.DEFINE_integer("port", None, "Port to run the server on")
+  flags.DEFINE_string("woo_commerce", None, "WooCommerce address, e.g.: http://my-woo-commerce-store.online/")
 except flags.DuplicateFlagError:
   pass
 
