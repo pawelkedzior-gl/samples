@@ -548,18 +548,16 @@ Note:
             li_1 = next(
                 li
                 for li in checkout_data["line_items"]
-                if li["item"]["id"] == "bouquet_roses"
+                if li["item"]["id"] == "35"  # Hat
             )
 
             li_2 = next(
                 li
                 for li in checkout_data["line_items"]
-                if li["item"]["id"] == "pot_ceramic"
+                if li["item"]["id"] == "31"  # Jacket
             )
 
-            item1_update = item_update_request.ItemUpdateRequest(
-                id="bouquet_roses", title="Red Rose"
-            )
+            item1_update = item_update_request.ItemUpdateRequest(id="35")  # Hat
 
             line_item1_update = line_item_update_request.LineItemUpdateRequest(
                 id=li_1["id"],
@@ -567,9 +565,7 @@ Note:
                 item=item1_update,
             )
 
-            item2_update = item_update_request.ItemUpdateRequest(
-                id="pot_ceramic", title="Ceramic Pot"
-            )
+            item2_update = item_update_request.ItemUpdateRequest(id="31")  # Jacket
 
             line_item2_update = line_item_update_request.LineItemUpdateRequest(
                 id=li_2["id"],
@@ -801,7 +797,7 @@ Note:
 
         # logic.
 
-        target_handler = "mock_payment_handler"
+        target_handler = "cheque"
 
         if not any(h["id"] == target_handler for h in supported_handlers):
             logger.warning(

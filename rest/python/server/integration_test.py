@@ -254,17 +254,26 @@ class IntegrationTest(absltest.TestCase):
       selected_destination_id="dest_1",
       groups=[group],
     )
-    fulfillment = Fulfillment(
-      root=fulfillment_req.Fulfillment(methods=[method])
-    )
+    
+    # Patch dicts to satisfy FulfillmentMethod validation which requires IDs
+    method_dict = method.model_dump(exclude_none=True)
+    if "id" not in method_dict:
+      method_dict["id"] = "method_1"
+    if "groups" in method_dict:
+      for g in method_dict["groups"]:
+        if "id" not in g:
+          g["id"] = "group_1"
+        if "line_item_ids" not in g:
+          g["line_item_ids"] = [i_id for i_id, _, _, _ in items]
 
     return checkout_create_req.CheckoutCreateRequest(
       id=checkout_id,
       currency="USD",
       line_items=line_items,
       payment=payment,
-      fulfillment=fulfillment,
-    )
+      fulfillment={"methods": [method_dict]},
+  )
+
 
   def _create_payment_payload(self) -> dict:
     """Create a payment payload using SDK models."""
@@ -281,11 +290,10 @@ class IntegrationTest(absltest.TestCase):
       credential=credential,
     )
     return {
-      "payment_data": payment_instrument.PaymentInstrument(
-        root=instrument
-      ).model_dump(mode="json", exclude_none=True),
+      "payment_data": instrument.model_dump(mode="json", exclude_none=True),
       "risk_signals": {},
     }
+
 
   def test_single_item_checkout(self) -> None:
     """Test the full lifecycle of a single item checkout."""
